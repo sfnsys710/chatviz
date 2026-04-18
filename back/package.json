@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "api": "tsx src/server.ts",
-    "seed": "tsx seed.ts",
+    "seed": "tsx seed_redis.ts",
     "build": "tsc",
     "serve": "node dist/server.js"
   },
