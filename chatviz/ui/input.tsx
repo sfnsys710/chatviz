@@ -1,6 +1,6 @@
 'use client'
 
-interface InputProps {
+type InputProps = {
   name: string;
   placeholder: string;
   value: string;
