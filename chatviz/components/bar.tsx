@@ -10,12 +10,11 @@ type ScatterProps = {
     rows: SalesRow[]
 }
 
-export default function Scatter({ rows }: ScatterProps) {
+export default function Bar({ rows }: ScatterProps) {
     const data: Partial<Data>[] = [
         {
-            type: 'scatter',
-            mode: 'markers',
-            x: rows.map(r => r.units_sold),
+            type: 'bar',
+            x: rows.map(r => r.product),
             y: rows.map(r => r.revenue),
         },
     ]

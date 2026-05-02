@@ -2,7 +2,7 @@
 
 import { Data, Layout } from 'plotly.js';
 import dynamic from 'next/dynamic';
-import { SalesRow } from '../lib/types'
+import { SalesRow } from '@/lib/types'
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false })
 

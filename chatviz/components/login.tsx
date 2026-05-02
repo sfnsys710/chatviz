@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import Input from '../ui/input'
+import Input from '@/ui/input'
 
 export default function Login() {
     const [username, setUsername] = useState('')

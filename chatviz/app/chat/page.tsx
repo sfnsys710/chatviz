@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Message } from '../../lib/types'
-import ConversationIn from '../../components/conversationint'
-import ConversationOut from '../../components/conversationout'
+import { Message } from '@/lib/types'
+import ConversationIn from '@/components/conversationint'
+import ConversationOut from '@/components/conversationout'
 
 
 export default function Chatbot() {
