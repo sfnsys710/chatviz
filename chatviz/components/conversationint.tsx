@@ -1,5 +1,8 @@
 'use client'
 
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+
 type ConversationInProps = {
     text: string;
     onTextChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -15,20 +18,20 @@ export default function ConversationIn({text, onTextChange, onSend}: Conversatio
     }
 
     return (
-        <div className="flex gap-2 w-full">
-            <textarea
+        <div className="rounded-2xl border p-2 flex flex-col gap-2">
+            <Textarea
                 placeholder="How can I help you today?"
-                className="rounded-2xl flex-1 px-4 py-2 border"
+                className="border-0 shadow-none focus-visible:ring-0 resize-none"
+                value={text}
                 onChange={onTextChange}
                 onKeyDown={handleKeyDown}
-                value={text}
             />
-            <button
-                className="bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded"
-                onClick={() => onSend()}
-            >
-                Send
-            </button>
+            <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                    {/* future settings */}
+                </div>
+                <Button onClick={() => onSend()}>Send</Button>
+            </div>
         </div>
     )
 }
