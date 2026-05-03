@@ -3,20 +3,26 @@
 import { Data, Layout } from 'plotly.js';
 import dynamic from 'next/dynamic';
 import { SalesRow } from '@/lib/types'
+import { filterRows } from '@/lib/helpers'
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false })
 
 type ScatterProps = {
     rows: SalesRow[]
+    selectedProduct?: string;
+    selectedRegion?: string;
 }
 
-export default function Scatter({ rows }: ScatterProps) {
+export default function Scatter({ rows, selectedProduct, selectedRegion}: ScatterProps) {
+
+    const filteredRows = filterRows(rows, selectedProduct, selectedRegion)
+
     const data: Partial<Data>[] = [
         {
             type: 'scatter',
             mode: 'markers',
-            x: rows.map(r => r.units_sold),
-            y: rows.map(r => r.revenue),
+            x: filteredRows.map(r => r.units_sold),
+            y: filteredRows.map(r => r.revenue),
         },
     ]
 
