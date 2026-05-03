@@ -2,16 +2,19 @@
 
 import { useEffect, useRef } from "react"
 import { Message } from "@/lib/types"
+import { Card, CardContent } from "@/components/ui/card"
 
 type ConversationOutProps = {
     messages: Message[];
 }
 
 function MessageBubble({role, content}: Message) {
-    const userClasses = "bg-lime-600 text-white self-end"
-    const assistantClasses = "bg-gray-600 text-white self-start"
-    const allClasses = `px-4 py-2 rounded-2xl max-w-[80%] ${role === 'user' ? userClasses : assistantClasses}`
-    return <p className={allClasses}>{content}</p>
+    const alignment = role === 'user' ? 'self-end bg-lime-600' : 'self-start bg-gray-600'
+    return (
+        <Card className={`max-w-[80%] text-white ${alignment}`}>
+            <CardContent>{content}</CardContent>
+        </Card>
+    )
 }
 
 export default function ConversationOut({messages}: ConversationOutProps) {
