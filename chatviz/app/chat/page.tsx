@@ -4,11 +4,13 @@ import { useState } from 'react'
 import { Message } from '@/lib/types'
 import ConversationIn from '@/components/conversationint'
 import ConversationOut from '@/components/conversationout'
+import VizSheet, { VizKind } from '@/components/viz_sheet'
 
 
 export default function Chatbot() {
     const [userText, setUserText] = useState<string>('')
     const [messages, setMessages] = useState<Message[]>([])
+    const [openViz, setOpenViz] = useState<VizKind | null>(null)
 
     function handleUserTextChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
         setUserText(event.target.value)
@@ -31,12 +33,14 @@ export default function Chatbot() {
         <div className={`h-screen flex flex-col ${isEmpty ? 'justify-center' : ''}`}>
             {!isEmpty && (
                 <div className="flex-1 overflow-y-auto w-[70%] max-w-3xl mx-auto">
-                    <ConversationOut messages={messages} />
+                    <ConversationOut messages={messages} setOpenViz={setOpenViz} />
                 </div>
             )}
             <div className="p-4 w-[70%] max-w-3xl mx-auto">
                 <ConversationIn text={userText} onTextChange={handleUserTextChange} onSend={handleSend} />
             </div>
+
+            <VizSheet openViz={openViz} onOpenVizClose={() => setOpenViz(null)} />
         </div>
     )
 }

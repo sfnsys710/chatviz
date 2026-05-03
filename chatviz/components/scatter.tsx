@@ -30,7 +30,8 @@ export default function Scatter({ rows, selectedProduct, selectedRegion}: Scatte
         title: { text: 'Units sold vs Revenue' },
         xaxis: { title: { text: 'Units sold' } },
         yaxis: { title: { text: 'Revenue' } },
+        autosize: true,
     }
 
-    return <Plot data={data} layout={layout} />
+    return <Plot data={data} layout={layout} useResizeHandler style={{ width: '100%' }} />
 }
