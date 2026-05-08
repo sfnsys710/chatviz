@@ -6,6 +6,7 @@ router.post('/', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream')
   res.setHeader('Cache-Control', 'no-cache')
   res.setHeader('Connection', 'keep-alive')
+  res.flushHeaders()
 
   const words = 'This is a fake streaming reply word by word from the backend.'.split(' ')
   let i = 0
@@ -21,7 +22,7 @@ router.post('/', (req, res) => {
     }
   }, 150)
 
-  req.on('close', () => clearInterval(interval))
+  res.on('close', () => clearInterval(interval))
 })
 
 export default router
