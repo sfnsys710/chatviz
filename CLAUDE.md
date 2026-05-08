@@ -87,18 +87,15 @@ npm run build
 npm run lint
 ```
 
-**Express backend (`api/`):**
+**Python agent (`agent/`):**
 ```bash
-docker compose up -d          # start Redis
-cd api && npm run dev          # http://localhost:3001  (tsx watch)
-cd api && npm run seed         # seed Redis with test data
-cd api && npm run build        # compile TS → dist/
-cd api && npm run serve        # run compiled output
+cd agent && uv sync           # install deps (first time)
+cd agent && uv run agent      # http://localhost:8000
 ```
 
 ### Architecture
 
-Two independent services — Next.js (root) and Express (`api/`):
+Two independent services — Next.js (root) and Python LangGraph agent (`agent/`):
 
 ```
 Next.js (port 3000)
@@ -106,9 +103,11 @@ Next.js (port 3000)
   app/api/sales/route.ts    ← GET, returns mock SalesRow[] (no auth)
   app/api/stream/route.ts   ← POST proxy; forwards body to $BACKEND_URL/stream and pipes SSE back
 
-Express (port 3001, api/)
-  src/server.ts             ← sets CORS for localhost:3000, mounts /stream
-  src/routes/stream.ts      ← POST /stream → fake word-by-word SSE response
+Python agent (port 8000, agent/)
+  src/agent/api.py          ← FastAPI app; CORS for localhost:3000; POST /stream SSE endpoint
+  src/agent/agents.py       ← LangGraph StateGraph: intent_classifier → chart_responder | chat_responder
+  src/agent/nodes.py        ← ChatState TypedDict + 3 async node functions
+  src/agent/config.py       ← MODEL_NAME, TEMPERATURE loaded from .env
 ```
 
 **Frontend data flow** (`app/page.tsx` is the state owner):
@@ -119,6 +118,6 @@ Express (port 3001, api/)
 
 **Shared types** (`lib/types.ts`): `Message`, `Chat`, `SalesRow` — used by both Next.js routes and components.
 
-**Environment variable**: `BACKEND_URL` (set in `.env`) points the Next.js stream proxy at the Express server (e.g. `http://localhost:3001`).
+**Environment variable**: `BACKEND_URL` (set in `.env`) points the Next.js stream proxy at the Python agent (e.g. `http://localhost:8000`).
 
-**Stack**: Next.js 16, React 19, Tailwind v4, shadcn/ui (Radix), Plotly via `react-plotly.js`, Express 5, ioredis, zod, jsonwebtoken.
+**Stack**: Next.js 16, React 19, Tailwind v4, shadcn/ui (Radix), Plotly via `react-plotly.js`, FastAPI, LangGraph, langchain-anthropic, uv.
