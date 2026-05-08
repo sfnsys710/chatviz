@@ -23,14 +23,15 @@ export default function Chatbot() {
 
     function handleSend() {
         if (userText.trim() === '') return
-        const userMessage: Message = { id: crypto.randomUUID(), role: 'user', content: userText }
+        const message = userText.trim()
+        const userMessage: Message = { id: crypto.randomUUID(), role: 'user', content: message }
 
         const isNewChat = activeChatId === null
         const chatId = activeChatId ?? crypto.randomUUID()
 
         if (isNewChat) {
             setActiveChatId(chatId)
-            setChats(prev => [...prev, { id: chatId, title: userText.slice(0, 40), messages: [userMessage] }])
+            setChats(prev => [...prev, { id: chatId, title: message.slice(0, 40), messages: [userMessage] }])
         } else {
             setChats(prev => prev.map(chat => {
                 if (chat.id !== chatId) return chat
@@ -38,10 +39,10 @@ export default function Chatbot() {
             }))
         }
         setUserText('')
-        streamReply(chatId)
+        streamReply(chatId, message)
     }
 
-    async function streamReply(chatId: string) {
+    async function streamReply(chatId: string, message: string) {
         const replyId = crypto.randomUUID()
         setIsStreaming(true)
 
@@ -53,7 +54,7 @@ export default function Chatbot() {
         const response = await fetch('/api/stream', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chatId }),
+            body: JSON.stringify({ chatId, message }),
         })
 
         const reader = response.body!.getReader()

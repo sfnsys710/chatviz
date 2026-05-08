@@ -1,0 +1,24 @@
+[project]
+name = "agent"
+version = "0.1.0"
+description = "chatviz LangGraph agent backend"
+readme = "README.md"
+authors = [
+    { name = "sfnsys710", email = "soufianenidam7@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "langgraph>=0.3.0",
+    "langchain-anthropic>=0.3.0",
+    "langchain-core>=0.3.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+agent = "agent.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.8.17,<0.9.0"]
+build-backend = "uv_build"
