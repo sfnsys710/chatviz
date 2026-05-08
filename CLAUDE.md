@@ -66,60 +66,16 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
 
-<!-- BEGIN:nextjs-agent-rules -->
-## This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
-
 ---
 
 ## Project: chatviz
 
-Chat-driven data visualization prototype. Send a message, get back charts and tables.
-
-### Commands
-
-**Frontend (root):**
-```bash
-npm run dev            # http://localhost:3000 — uses BACKEND_URL from .env
-npm run dev:agent      # forces BACKEND_URL=http://localhost:8000 (Python agent)
-npm run dev:express    # forces BACKEND_URL=http://localhost:3001 (Express)
-npm run build
-npm run lint
-```
-
-**Python agent (`agent/`):**
-```bash
-cd agent && uv sync           # install deps (first time)
-cd agent && uv run agent      # http://localhost:8000
-```
-
-### Architecture
-
-Two independent services — Next.js (root) and Python LangGraph agent (`agent/`):
+Chat-driven data visualization prototype — 3 independent services:
 
 ```
-Next.js (port 3000)
-  app/page.tsx              ← single page; owns all chat state
-  app/api/sales/route.ts    ← GET, returns mock SalesRow[] (no auth)
-  app/api/stream/route.ts   ← POST proxy; forwards body to $BACKEND_URL/stream and pipes SSE back
-
-Python agent (port 8000, agent/)
-  src/agent/api.py          ← FastAPI app; CORS for localhost:3000; POST /stream SSE endpoint
-  src/agent/agents.py       ← LangGraph StateGraph: intent_classifier → chart_responder | chat_responder
-  src/agent/nodes.py        ← ChatState TypedDict + 3 async node functions
-  src/agent/config.py       ← MODEL_NAME, TEMPERATURE loaded from .env
+front/    Next.js 16 chat UI + viz panel          → front/CLAUDE.md
+agent/    Python LangGraph backend (active)       → agent/CLAUDE.md
+api/      Express + Redis playground (learning)   → api/CLAUDE.md
 ```
 
-**Frontend data flow** (`app/page.tsx` is the state owner):
-- `chats: Chat[]` + `activeChatId` live in the page component and flow down as props.
-- `handleSend` appends the user message, creates a chat if needed, then calls `streamReply`.
-- `streamReply` opens a fetch to `/api/stream`, reads SSE chunks, and appends them word-by-word to the active assistant message.
-- `VizSheet` is a slide-over panel (shadcn Sheet) that renders Bar/Scatter charts from `/api/sales` data; it's opened via `setOpenViz('bar' | 'scatter')` passed through `Conversation` → `ConversationOut`.
-
-**Shared types** (`lib/types.ts`): `Message`, `Chat`, `SalesRow` — used by both Next.js routes and components.
-
-**Environment variable**: `BACKEND_URL` (set in `.env`) points the Next.js stream proxy at the Python agent (e.g. `http://localhost:8000`).
-
-**Stack**: Next.js 16, React 19, Tailwind v4, shadcn/ui (Radix), Plotly via `react-plotly.js`, FastAPI, LangGraph, langchain-anthropic, uv.
+Each subfolder has its own `CLAUDE.md`, `README.md`, and `.gitignore`. Read the relevant one before touching a service.
