@@ -7,6 +7,12 @@ export type Message = {
     content: string;
 }
 
+export type Chat = {
+    id: string;
+    title: string;
+    messages: Message[];
+}
+
 export type SalesRow = {
     date: string;
     product: 'Widget A' | 'Widget B' | 'Gadget X' | 'Gadget Y';

@@ -14,30 +14,30 @@ import {
     SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import SettingsDialog from "@/components/settingsdialog";
+import { Chat } from "@/lib/types";
 
-const FAKE_CHATS = [
-    { id: '1', title: 'Sales by region last quarter' },
-    { id: '2', title: 'Top products by revenue' },
-    { id: '3', title: 'Customer satisfaction trends' },
-    { id: '4', title: 'Widget A vs Widget B' },
-    { id: '5', title: 'Monthly revenue breakdown' },
-];
+type Props = {
+    chats: Chat[]
+    activeChatId: string | null
+    onNewChat: () => void
+    onSelectChat: (id: string) => void
+}
 
-export default function AppSidebar() {
+export default function AppSidebar({ chats, activeChatId, onNewChat, onSelectChat }: Props) {
     return (
         <Sidebar>
             <SidebarHeader>
                 <h3 className="px-2 text-lg font-semibold">ChatViz</h3>
-                <Button>+ New Chat</Button>
+                <Button onClick={onNewChat}>+ New Chat</Button>
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>History</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {FAKE_CHATS.map(chat => (
+                            {chats.map(chat => (
                                 <SidebarMenuItem key={chat.id}>
-                                    <SidebarMenuButton>{chat.title}</SidebarMenuButton>
+                                    <SidebarMenuButton onClick={() => onSelectChat(chat.id)} isActive={chat.id === activeChatId}>{chat.title}</SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
                         </SidebarMenu>

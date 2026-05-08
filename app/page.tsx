@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Message } from '@/lib/types'
+import { Chat, Message } from '@/lib/types'
 import VizSheet, { VizKind } from '@/components/viz_sheet'
 import AppSidebar from '@/components/appsidebar'
 import Conversation from '@/components/conversation'
@@ -9,9 +9,12 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/s
 
 
 export default function Chatbot() {
+    const [chats, setChats] = useState<Chat[]>([])
+    const [activeChatId, setActiveChatId] = useState<string | null>(null)
     const [userText, setUserText] = useState<string>('')
-    const [messages, setMessages] = useState<Message[]>([])
     const [openViz, setOpenViz] = useState<VizKind | null>(null)
+
+    const messages = chats.find(c => c.id === activeChatId)?.messages ?? []
 
     function handleUserTextChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
         setUserText(event.target.value)
@@ -20,17 +23,48 @@ export default function Chatbot() {
     function handleSend() {
         if (userText.trim() === '') return
         const userMessage: Message = { id: crypto.randomUUID(), role: 'user', content: userText }
-        setMessages(prev => [...prev, userMessage])
+
+        const isNewChat = activeChatId === null
+        const chatId = activeChatId ?? crypto.randomUUID()
+
+        if (isNewChat) {
+            setActiveChatId(chatId)
+            setChats(prev => [...prev, { id: chatId, title: userText.slice(0, 40), messages: [userMessage] }])
+        } else {
+            setChats(prev => prev.map(chat => {
+                if (chat.id !== chatId) return chat
+                return { ...chat, messages: [...chat.messages, userMessage] }
+            }))
+        }
         setUserText('')
 
         setTimeout(() => {
-            setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: 'fake reply' }])
+            const reply: Message = { id: crypto.randomUUID(), role: 'assistant', content: 'fake reply' }
+            setChats(prev => prev.map(chat => {
+                if (chat.id !== chatId) return chat
+                return { ...chat, messages: [...chat.messages, reply] }
+            }))
         }, 500)
+    }
+
+    function handleSelectChat(id: string) {
+        setActiveChatId(id)
+        setUserText('')
+    }
+
+    function handleNewChat() {
+        setActiveChatId(null)
+        setUserText('')
     }
 
     return (
         <SidebarProvider defaultOpen={false}>
-            <AppSidebar />
+            <AppSidebar 
+                chats={chats} 
+                activeChatId={activeChatId} 
+                onNewChat={handleNewChat} 
+                onSelectChat={handleSelectChat} 
+            />
             <SidebarInset>
                 <SidebarTrigger className="m-2" />
                 <Conversation
