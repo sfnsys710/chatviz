@@ -11,9 +11,10 @@ type Props = {
     onTextChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
     onSend: () => void
     setOpenViz: (viz: VizKind | null) => void
+    disabled?: boolean
 }
 
-export default function Conversation({ messages, userText, onTextChange, onSend, setOpenViz }: Props) {
+export default function Conversation({ messages, userText, onTextChange, onSend, setOpenViz, disabled }: Props) {
     const isEmpty = messages.length === 0
 
     return (
@@ -24,7 +25,7 @@ export default function Conversation({ messages, userText, onTextChange, onSend,
                 </div>
             )}
             <div className="p-4 w-[70%] max-w-3xl mx-auto">
-                <ConversationIn text={userText} onTextChange={onTextChange} onSend={onSend} />
+                <ConversationIn text={userText} onTextChange={onTextChange} onSend={onSend} disabled={disabled} />
             </div>
         </div>
     )

@@ -7,9 +7,10 @@ type ConversationInProps = {
     text: string;
     onTextChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onSend: () => void;
+    disabled?: boolean;
 }
 
-export default function ConversationIn({text, onTextChange, onSend}: ConversationInProps) {
+export default function ConversationIn({text, onTextChange, onSend, disabled}: ConversationInProps) {
     function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
@@ -25,12 +26,13 @@ export default function ConversationIn({text, onTextChange, onSend}: Conversatio
                 value={text}
                 onChange={onTextChange}
                 onKeyDown={handleKeyDown}
+                disabled={disabled}
             />
             <div className="flex justify-between items-center">
                 <div className="flex gap-2">
                     {/* future settings */}
                 </div>
-                <Button onClick={() => onSend()}>Send</Button>
+                <Button onClick={() => onSend()} disabled={disabled}>Send</Button>
             </div>
         </div>
     )

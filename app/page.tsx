@@ -13,6 +13,7 @@ export default function Chatbot() {
     const [activeChatId, setActiveChatId] = useState<string | null>(null)
     const [userText, setUserText] = useState<string>('')
     const [openViz, setOpenViz] = useState<VizKind | null>(null)
+    const [isStreaming, setIsStreaming] = useState(false)
 
     const messages = chats.find(c => c.id === activeChatId)?.messages ?? []
 
@@ -37,14 +38,59 @@ export default function Chatbot() {
             }))
         }
         setUserText('')
+        streamReply(chatId)
+    }
 
-        setTimeout(() => {
-            const reply: Message = { id: crypto.randomUUID(), role: 'assistant', content: 'fake reply' }
-            setChats(prev => prev.map(chat => {
-                if (chat.id !== chatId) return chat
-                return { ...chat, messages: [...chat.messages, reply] }
-            }))
-        }, 500)
+    async function streamReply(chatId: string) {
+        const replyId = crypto.randomUUID()
+        setIsStreaming(true)
+
+        setChats(prev => prev.map(chat => {
+            if (chat.id !== chatId) return chat
+            return { ...chat, messages: [...chat.messages, { id: replyId, role: 'assistant' as const, content: '' }] }
+        }))
+
+        const response = await fetch('/api/stream', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chatId }),
+        })
+
+        const reader = response.body!.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+
+            buffer += decoder.decode(value, { stream: true })
+            const parts = buffer.split('\n\n')
+            buffer = parts.pop()!
+
+            for (const part of parts) {
+                const line = part.trim()
+                if (!line.startsWith('data: ')) continue
+                const data = line.slice(6)
+
+                if (data === '[DONE]') {
+                    setIsStreaming(false)
+                    return
+                }
+
+                setChats(prev => prev.map(chat => {
+                    if (chat.id !== chatId) return chat
+                    return {
+                        ...chat,
+                        messages: chat.messages.map(m =>
+                            m.id === replyId ? { ...m, content: m.content + data + ' ' } : m
+                        )
+                    }
+                }))
+            }
+        }
+
+        setIsStreaming(false)
     }
 
     function handleSelectChat(id: string) {
@@ -59,11 +105,11 @@ export default function Chatbot() {
 
     return (
         <SidebarProvider defaultOpen={false}>
-            <AppSidebar 
-                chats={chats} 
-                activeChatId={activeChatId} 
-                onNewChat={handleNewChat} 
-                onSelectChat={handleSelectChat} 
+            <AppSidebar
+                chats={chats}
+                activeChatId={activeChatId}
+                onNewChat={handleNewChat}
+                onSelectChat={handleSelectChat}
             />
             <SidebarInset>
                 <SidebarTrigger className="m-2" />
@@ -73,6 +119,7 @@ export default function Chatbot() {
                     onTextChange={handleUserTextChange}
                     onSend={handleSend}
                     setOpenViz={setOpenViz}
+                    disabled={isStreaming}
                 />
                 <VizSheet openViz={openViz} onOpenVizClose={() => setOpenViz(null)} />
             </SidebarInset>
