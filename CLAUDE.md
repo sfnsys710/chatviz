@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
@@ -69,3 +71,54 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+
+---
+
+## Project: chatviz
+
+Chat-driven data visualization prototype. Send a message, get back charts and tables.
+
+### Commands
+
+**Frontend (root):**
+```bash
+npm run dev        # http://localhost:3000
+npm run build
+npm run lint
+```
+
+**Express backend (`api/`):**
+```bash
+docker compose up -d          # start Redis
+cd api && npm run dev          # http://localhost:3001  (tsx watch)
+cd api && npm run seed         # seed Redis with test data
+cd api && npm run build        # compile TS → dist/
+cd api && npm run serve        # run compiled output
+```
+
+### Architecture
+
+Two independent services — Next.js (root) and Express (`api/`):
+
+```
+Next.js (port 3000)
+  app/page.tsx              ← single page; owns all chat state
+  app/api/sales/route.ts    ← GET, returns mock SalesRow[] (no auth)
+  app/api/stream/route.ts   ← POST proxy; forwards body to $BACKEND_URL/stream and pipes SSE back
+
+Express (port 3001, api/)
+  src/server.ts             ← sets CORS for localhost:3000, mounts /stream
+  src/routes/stream.ts      ← POST /stream → fake word-by-word SSE response
+```
+
+**Frontend data flow** (`app/page.tsx` is the state owner):
+- `chats: Chat[]` + `activeChatId` live in the page component and flow down as props.
+- `handleSend` appends the user message, creates a chat if needed, then calls `streamReply`.
+- `streamReply` opens a fetch to `/api/stream`, reads SSE chunks, and appends them word-by-word to the active assistant message.
+- `VizSheet` is a slide-over panel (shadcn Sheet) that renders Bar/Scatter charts from `/api/sales` data; it's opened via `setOpenViz('bar' | 'scatter')` passed through `Conversation` → `ConversationOut`.
+
+**Shared types** (`lib/types.ts`): `Message`, `Chat`, `SalesRow` — used by both Next.js routes and components.
+
+**Environment variable**: `BACKEND_URL` (set in `.env`) points the Next.js stream proxy at the Express server (e.g. `http://localhost:3001`).
+
+**Stack**: Next.js 16, React 19, Tailwind v4, shadcn/ui (Radix), Plotly via `react-plotly.js`, Express 5, ioredis, zod, jsonwebtoken.
