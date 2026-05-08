@@ -28,7 +28,9 @@ Frontend (root):
 
 ```bash
 npm install
-npm run dev                    # http://localhost:3000
+npm run dev:agent              # http://localhost:3000 → Python agent (:8000)
+npm run dev:express            # http://localhost:3000 → Express (:3001)
+npm run dev                    # uses BACKEND_URL from .env
 ```
 
 Python agent (`agent/`):

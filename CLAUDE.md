@@ -82,7 +82,9 @@ Chat-driven data visualization prototype. Send a message, get back charts and ta
 
 **Frontend (root):**
 ```bash
-npm run dev        # http://localhost:3000
+npm run dev            # http://localhost:3000 — uses BACKEND_URL from .env
+npm run dev:agent      # forces BACKEND_URL=http://localhost:8000 (Python agent)
+npm run dev:express    # forces BACKEND_URL=http://localhost:3001 (Express)
 npm run build
 npm run lint
 ```

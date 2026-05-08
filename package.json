@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:agent": "BACKEND_URL=http://localhost:8000 next dev",
+    "dev:express": "BACKEND_URL=http://localhost:3001 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
