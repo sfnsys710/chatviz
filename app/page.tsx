@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { Message } from '@/lib/types'
-import ConversationIn from '@/components/conversationint'
-import ConversationOut from '@/components/conversationout'
 import VizSheet, { VizKind } from '@/components/viz_sheet'
+import AppSidebar from '@/components/appsidebar'
+import Conversation from '@/components/conversation'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
 
 
 export default function Chatbot() {
@@ -27,20 +28,20 @@ export default function Chatbot() {
         }, 500)
     }
 
-    const isEmpty = messages.length === 0
-
     return (
-        <div className={`h-screen flex flex-col ${isEmpty ? 'justify-center' : ''}`}>
-            {!isEmpty && (
-                <div className="flex-1 overflow-y-auto w-[70%] max-w-3xl mx-auto">
-                    <ConversationOut messages={messages} setOpenViz={setOpenViz} />
-                </div>
-            )}
-            <div className="p-4 w-[70%] max-w-3xl mx-auto">
-                <ConversationIn text={userText} onTextChange={handleUserTextChange} onSend={handleSend} />
-            </div>
-
-            <VizSheet openViz={openViz} onOpenVizClose={() => setOpenViz(null)} />
-        </div>
+        <SidebarProvider defaultOpen={false}>
+            <AppSidebar />
+            <SidebarInset>
+                <SidebarTrigger className="m-2" />
+                <Conversation
+                    messages={messages}
+                    userText={userText}
+                    onTextChange={handleUserTextChange}
+                    onSend={handleSend}
+                    setOpenViz={setOpenViz}
+                />
+                <VizSheet openViz={openViz} onOpenVizClose={() => setOpenViz(null)} />
+            </SidebarInset>
+        </SidebarProvider>
     )
 }
