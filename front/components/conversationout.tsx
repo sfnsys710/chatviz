@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from "react"
+import ReactMarkdown from "react-markdown"
 import { Message } from "@/lib/types"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -20,7 +21,11 @@ function MessageBubble({role, content, setOpenViz}: MessageBubbleProps) {
     const alignment = role === 'user' ? 'self-end bg-lime-600' : 'self-start bg-gray-600'
     return (
         <Card className={`max-w-[80%] text-white ${alignment}`}>
-            <CardContent>{content}</CardContent>
+            <CardContent>
+                {role === 'assistant'
+                    ? <div className="prose prose-invert prose-sm max-w-none"><ReactMarkdown>{content}</ReactMarkdown></div>
+                    : content}
+            </CardContent>
             {role === 'assistant' && (
                 <CardFooter className="flex gap-2">
                     <Button variant="secondary" size="sm" onClick={() => setOpenViz('bar')}>Bar</Button>
