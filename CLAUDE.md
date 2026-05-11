@@ -70,7 +70,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## Project: chatviz
 
-Chat-driven data visualization prototype — 3 independent services:
+Chat-to-viz: users upload data, ask questions in natural language, and get streaming answers + interactive Plotly charts from an AI agent. Early prototype — 3 independent services:
 
 ```
 front/    Next.js 16 chat UI + viz panel          → front/CLAUDE.md
