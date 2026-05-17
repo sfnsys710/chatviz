@@ -31,7 +31,7 @@ export default function Table({ rows }: TableProps) {
                 align: 'left',                                                                                      
             },  
         },
-    ] as Partial<Data>[]
+    ] as unknown as Partial<Data>[]
 
     const layout: Partial<Layout> = {
         title: { text: 'Sales Data' },
