@@ -3,7 +3,9 @@ name: agent
 on:
   push:
     branches: [main]
-    paths: [agent/**]
+    paths:
+      - agent/**
+      - .github/workflows/agent.yml
 
 permissions:
   packages: write

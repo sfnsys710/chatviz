@@ -3,7 +3,9 @@ name: front
 on:
   push:
     branches: [main]
-    paths: [front/**]
+    paths:
+      - front/**
+      - .github/workflows/front.yml
 
 permissions:
   packages: write
