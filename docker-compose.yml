@@ -1,0 +1,15 @@
+services:
+  agent:
+    image: chatviz-agent:local
+    env_file: agent/.env
+    ports:
+      - "8000:8000"
+
+  front:
+    image: chatviz-front:local
+    environment:
+      BACKEND_URL: http://agent:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - agent
