@@ -26,6 +26,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: default
+      terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
