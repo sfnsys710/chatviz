@@ -8,7 +8,7 @@ import os
 if os.getenv("PHOENIX_TRACING", "false").lower() == "true":
     from phoenix.otel import register
     from openinference.instrumentation.langchain import LangChainInstrumentor
-    register(endpoint=os.getenv("PHOENIX_ENDPOINT", "http://phoenix-svc:4317"))
+    register(endpoint=os.getenv("PHOENIX_ENDPOINT", "http://phoenix-svc:4317"), protocol="grpc")
     LangChainInstrumentor().instrument()
 
 from .agents import build_graph
