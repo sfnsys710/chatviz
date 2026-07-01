@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/sfnsys710/chatviz-agent
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.0"
+  tag: "0.3.0"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -49,7 +49,10 @@ autoscaling:
   maxReplicas: 5
   targetCPUUtilizationPercentage: 50
 
-env: {} # set at install time via --set"
+env:
+  PHOENIX_TRACING: "true"
+  PHOENIX_ENDPOINT: "http://phoenix-svc:4317"
+  # ANTHROPIC_API_KEY: set at install time via --set only, never commit
 
 nodeSelector: {}
 

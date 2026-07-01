@@ -3,6 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage
 
+import os
+
+if os.getenv("PHOENIX_TRACING", "false").lower() == "true":
+    from phoenix.otel import register
+    from openinference.instrumentation.langchain import LangChainInstrumentor
+    register(endpoint=os.getenv("PHOENIX_ENDPOINT", "http://phoenix-svc:4317"))
+    LangChainInstrumentor().instrument()
+
 from .agents import build_graph
 
 app = FastAPI()
