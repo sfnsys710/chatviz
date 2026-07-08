@@ -1,0 +1,128 @@
+---
+# Source: agent/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatviz-agent
+  labels:
+    helm.sh/chart: agent-0.1.0
+    app.kubernetes.io/name: agent
+    app.kubernetes.io/instance: agent
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: agent
+    app.kubernetes.io/instance: agent
+---
+# Source: agent/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatviz-agent
+  labels:
+    helm.sh/chart: agent-0.1.0
+    app.kubernetes.io/name: agent
+    app.kubernetes.io/instance: agent
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: agent
+      app.kubernetes.io/instance: agent
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: agent-0.1.0
+        app.kubernetes.io/name: agent
+        app.kubernetes.io/instance: agent
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 120
+      securityContext:
+        {}
+      containers:
+        - name: agent
+          securityContext:
+            {}
+          image: "ghcr.io/sfnsys710/chatviz-agent:0.3.1"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PHOENIX_ENDPOINT
+              value: "http://phoenix-svc:4317"
+            - name: PHOENIX_TRACING
+              value: "true"
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            tcpSocket:
+              port: http
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+---
+# Source: agent/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: chatviz-agent
+  labels:
+    helm.sh/chart: agent-0.1.0
+    app.kubernetes.io/name: agent
+    app.kubernetes.io/instance: agent
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: chatviz-agent
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+---
+# Source: agent/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "chatviz-agent-test-connection"
+  labels:
+    helm.sh/chart: agent-0.1.0
+    app.kubernetes.io/name: agent
+    app.kubernetes.io/instance: agent
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['chatviz-agent:8000']
+  restartPolicy: Never
