@@ -1,0 +1,11 @@
+# A top-level key matching a subchart NAME passes values INTO that subchart,
+# overriding its own values.yaml. `global` is merged into every subchart.
+global: {}
+
+agent:
+  enabled: true
+  # image:
+  #   tag: "0.3.1"     # example: override charts/agent/values.yaml from here
+
+front:
+  enabled: true

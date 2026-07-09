@@ -1,0 +1,9 @@
+dependencies:
+- name: agent
+  repository: file://../agent
+  version: 0.1.0
+- name: front
+  repository: file://../front
+  version: 0.1.0
+digest: sha256:fa21b794ac932082d5ae699de04452cf151af84e776730679dd95c3c461389d1
+generated: "2026-07-09T16:09:47.805406+01:00"
