@@ -1,0 +1,20 @@
+# Prod overlay — delta over values.yaml + subchart defaults.
+# Deploy (image tags are promoted SHAs, set by CI — build once, deploy many):
+#   helm upgrade --install chatviz charts/chatviz \
+#     -n prod --create-namespace \
+#     -f charts/chatviz/values-prod.yaml \
+#     --set agent.image.tag="$SHA" --set front.image.tag="$SHA" \
+#     --set agent.env.ANTHROPIC_API_KEY="$PROD_KEY" \
+#     --atomic --timeout 5m
+#
+# front ingress host stays the subchart default (chatviz.local) until P4
+# brings a real domain; dev overrides its host instead.
+
+agent:
+  autoscaling:
+    minReplicas: 2   # no single point of failure
+    # maxReplicas + targetCPUUtilizationPercentage: tune from X3 loop results
+  # resources: set from X3 tuning loop before real traffic
+
+front:
+  replicaCount: 2

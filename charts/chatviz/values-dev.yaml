@@ -1,0 +1,22 @@
+# Dev overlay — delta over values.yaml + subchart defaults.
+# Deploy:
+#   helm upgrade --install chatviz charts/chatviz \
+#     -n dev --create-namespace \
+#     -f charts/chatviz/values-dev.yaml \
+#     --set agent.env.ANTHROPIC_API_KEY="$DEV_KEY"
+
+agent:
+  replicaCount: 2    # fixed 2 pods: enough to reproduce multi-pod state issues (X4)
+  autoscaling:
+    enabled: false   # no HPA noise while iterating
+
+front:
+  ingress:
+    # NOTE: lists are replaced, not merged — repeat the full entry.
+    # Host must differ from prod: duplicate host+path across namespaces
+    # makes ingress-nginx pick the oldest and ignore the other.
+    hosts:
+      - host: dev.chatviz.local
+        paths:
+          - path: /
+            pathType: Prefix
