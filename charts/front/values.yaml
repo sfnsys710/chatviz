@@ -7,8 +7,9 @@ replicaCount: 1
 image:
   repository: ghcr.io/sfnsys710/chatviz-front
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.0"
+  # Overrides the image tag whose default is the chart appVersion
+  # (kept in sync with package.json version). Empty on purpose.
+  tag: ""
 
 imagePullSecrets: []
 nameOverride: ""
