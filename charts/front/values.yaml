@@ -32,8 +32,8 @@ service:
   type: ClusterIP
   port: 3000
 
-ingress:  
-  enabled: true
+ingress:
+  enabled: false  # port-forward for now; env overlays turn this on when ingress-nginx exists (P4)
   className: "nginx"
   annotations: {}
   hosts:

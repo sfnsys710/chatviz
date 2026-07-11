@@ -9,14 +9,3 @@ agent:
   replicaCount: 2    # fixed 2 pods: enough to reproduce multi-pod state issues (X4)
   autoscaling:
     enabled: false   # no HPA noise while iterating
-
-front:
-  ingress:
-    # NOTE: lists are replaced, not merged — repeat the full entry.
-    # Host must differ from prod: duplicate host+path across namespaces
-    # makes ingress-nginx pick the oldest and ignore the other.
-    hosts:
-      - host: dev.chatviz.local
-        paths:
-          - path: /
-            pathType: Prefix
